@@ -5,7 +5,7 @@ AC_CONFIG_SRCDIR([src/driver.cpp])
 AC_PROG_CXXCPP
 AC_PROG_CXX
 
-AM_INIT_AUTOMAKE([1.9])
+AM_INIT_AUTOMAKE([1.9 foreign])
 
 AC_LANG([C++])
 
