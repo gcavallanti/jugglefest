@@ -26,10 +26,23 @@
 #include "types.hpp"
 #include "circuit.hpp"
 #include "juggler.hpp"
+#include <iostream>
 
 namespace JuggleFestParser {
 
-  struct ParseException {};
+  struct ParseException {
+    std::string errMsg;
+
+    ParseException()
+    {
+    }
+
+    ParseException(const std::string &errMsg)
+        : errMsg(errMsg)
+    {
+        std::cout << errMsg;
+    }
+  };
   
   void Parse(std::ifstream &ifs_file, std::list<Circuit> &circuits, std::list<Juggler> &jugglers);
   Circuit ParseCircuit(std::string &circuit_line);
