@@ -39,7 +39,17 @@ int main(int argc, char *argv[]) {
 
   std::list<Circuit> circuits;
   std::list<Juggler> jugglers;
-  JuggleFestParser::Parse(ifs_file, circuits, jugglers);
+  
+  try {
+    
+    JuggleFestParser::Parse(ifs_file, circuits, jugglers);
+
+  } catch (JuggleFestParser::ParseException e) {
+
+  ifs_file.close();
+    std::cout << e.errMsg << std::flush;
+    return 1;
+  }
 
   ifs_file.close();
 

@@ -27,6 +27,7 @@
 // used later for parsing the juggler lines.
 
 #include <sstream>
+#include <iostream>
 #include "jugglefestparser.hpp"
 #include "types.hpp"
 
@@ -38,20 +39,22 @@ void JuggleFestParser::Parse(std::ifstream &ifs_file, std::list<Circuit> &circui
   int i = 0;
   std::getline(ifs_file, line);
   do {
+    std::istringstream iss_line(line);
     if ((ifs_file >> std::noskipws >> std::ws) && ifs_file.eof())
       continue;
 
-    std::istringstream iss_line(line);
+    iss_line.str(line);
     char token;
     if ( !(iss_line >> token) || (token != 'C') )
       break;
 
     Circuit circuit = JuggleFestParser::ParseCircuit(line);
+ 
     circuit_names.insert(circuit.name());
     circuits.push_back(circuit);
 
   } while (std::getline(ifs_file, line));
-
+  
   do {
     std::istringstream iss_line(line);
     if ((iss_line >> std::noskipws >> std::ws) && iss_line.eof())
@@ -69,33 +72,33 @@ Circuit JuggleFestParser::ParseCircuit(std::string &circuit_line) {
   char token1;
   if ( !(in >> token1) 
        || (token1 != 'C') )
-    throw ParseException();
+    throw ParseException(circuit_line);
 
   std::string name;  
   if ( !(in >> name) )
-    throw ParseException();
+    throw ParseException(circuit_line);
 
   char token2;
   double H;
   if ( !(in >> token1 >> std::noskipws >> token2 >> H >> std::skipws) 
        || (token1 != 'H')
        || (token2 != ':') )
-    throw ParseException();
+    throw ParseException(circuit_line);
 
   double E;
   if ( !(in >> token1 >> std::noskipws >> token2 >> E >> std::skipws)
        || (token1 != 'E')
        || (token2 != ':') )
-    throw ParseException();
+    throw ParseException(circuit_line);
 
   double P;
   if ( !(in >> token1 >> std::noskipws >> token2 >> P >> std::skipws)
        || (token1 != 'P')
        || (token2 != ':') )
-    throw ParseException();
+    throw ParseException(circuit_line);
 
-  if (!(in >> std::noskipws >> std::ws) || !in.eof())
-    throw ParseException();
+  if (in >> std::noskipws >> std::ws, !in.eof())
+    throw ParseException("ParseCircuit:" + circuit_line);
 
   return Circuit(name, H, E, P);
 }
@@ -108,46 +111,46 @@ Juggler JuggleFestParser::ParseJuggler(std::string &juggler_line,
   char token1;
   if ( !(in >> token1) 
        || (token1 != 'J') )
-    throw ParseException();
+    throw ParseException(juggler_line);
 
   std::string name;
   if ( !(in >> name) )
-    throw ParseException();
+    throw ParseException(juggler_line);
 
   char token2;
   double H;
   if ( !(in >> token1 >> std::noskipws >> token2 >> H >> std::skipws) 
        || (token1 != 'H')
        || (token2 != ':') )
-    throw ParseException();
+    throw ParseException(juggler_line);
 
   double E;
   if ( !(in >> token1 >> std::noskipws >> token2 >> E >> std::skipws)
        || (token1 != 'E')
        || (token2 != ':') )
-    throw ParseException();
+    throw ParseException(juggler_line);
 
   double P;
   if ( !(in >> token1 >> std::noskipws >> token2 >> P >> std::skipws)
        || (token1 != 'P')
        || (token2 != ':') )
-    throw ParseException();
+    throw ParseException(juggler_line);
 
   std::string field;
   if ( !(in >> field) )
-    throw ParseException();
+    throw ParseException(juggler_line);
 
   std::stringstream iss_field(field);
   std::list<std::string> circuit_preferences;
   std::string circuit_name;
   while(std::getline(iss_field, circuit_name, ','))
     if (circuit_names.find(circuit_name) == circuit_names.end())
-      throw ParseException();
+      throw ParseException(juggler_line);
     else
       circuit_preferences.push_back(circuit_name);
 
-  if (!(in >> std::noskipws >> std::ws) || !in.eof())
-    throw ParseException();
+  if (in >> std::noskipws >> std::ws, !in.eof())
+    throw ParseException("ParseJuggler:" + juggler_line);
 
   return Juggler(name, H, E, P, circuit_preferences);
 }
