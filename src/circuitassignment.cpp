@@ -55,4 +55,6 @@ std::ostream &operator<<(std::ostream &out, const CircuitAssignment &circuit_ass
   }
 
   out << std::endl;
+
+  return out;
 }
